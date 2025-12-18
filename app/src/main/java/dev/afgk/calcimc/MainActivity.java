@@ -1,7 +1,9 @@
 package dev.afgk.calcimc;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,13 +21,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        setContentView(R.layout.activity_main);
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
 
         binding.calcularButton.setOnClickListener(v -> {
-            var peso = Float.parseFloat(binding.peso.getText().toString());
-            var altura = Float.parseFloat(binding.altura.getText().toString());
+            Log.d("MainActivity", "Botão clicado");
+
+            var pesoStr = binding.peso.getText().toString();
+            var alturaStr = binding.altura.getText().toString();
+
+            if (pesoStr.isEmpty() || alturaStr.isEmpty()) {
+                Toast toast = new Toast(this);
+                toast.setText("Preencha todos os campos");
+                toast.show();
+
+                return;
+            }
+
+            var peso = Float.parseFloat(pesoStr);
+            var altura = Float.parseFloat(alturaStr);
 
             var imc = peso / (altura * altura);
             var resultado = "";
@@ -42,8 +55,10 @@ public class MainActivity extends AppCompatActivity {
                 resultado = "Obesidade Grave III";
             }
 
-            binding.resultado.setText(resultado);
+            binding.resultado.setText(resultado + " ("  + imc + ")");
         });
+
+        setContentView(binding.getRoot());
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
